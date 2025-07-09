@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Registro RPE</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f0f0;
+      margin: 0;
+      padding: 0;
+    }
+
+    .background {
+      text-align: center;
+      margin-top: 20px;
+    }
+
+    .background img {
+      width: 180px;
+      opacity: 0.2;
+    }
+
+    .form-container {
+      max-width: 600px;
+      margin: auto;
+      background-color: #ffffff;
+      padding: 25px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+      margin-top: -30px;
+    }
+
+    h1 {
+      text-align: center;
+      margin-bottom: 10px;
+      color: #333;
+    }
+
+    label {
+      font-weight: bold;
+      color: #444;
+    }
+
+    .rating-group {
+      margin-bottom: 25px;
+    }
+
+    .rating-group p {
+      font-size: 14px;
+      margin: 5px 0 10px;
+      color: #555;
+      line-height: 1.6;
+      text-align: justify;
+    }
+
+    .rating-options {
+      margin-top: 8px;
+    }
+
+    .rating-option-label {
+      display: block;
+      margin-bottom: 5px;
+      font-size: 14px;
+    }
+
+    input[type="radio"] {
+      margin-right: 5px;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      margin-bottom: 20px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+
+    button {
+      background-color: #00b894;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      font-size: 16px;
+      border-radius: 5px;
+      cursor: pointer;
+      width: 100%;
+    }
+
+    button:hover {
+      background-color: #019875;
+    }
+
+    .success {
+      text-align: center;
+      margin-top: 15px;
+      font-weight: bold;
+      color: green;
+    }
+  </style>
+</head>
+<body>
+  <div class="background">
+    <img src="FC Grama.png" alt="Fe Grama" />
+  </div>
+
+  <div class="form-container">
+    <h1>RPE Diario</h1>
+    <form id="rpeForm">
+      <label for="nombre">Nombre Apellido:</label>
+      <input type="text" id="nombre" name="nombre" required />
+
+      <div class="rating-group">
+        <label>RPE – Esfuerzo Percibido:</label>
+        <p>¿Qué tan intenso fue el entrenamiento para ti?</p>
+        <div class="rating-options">
+          <label class="rating-option-label"><input type="radio" name="rpe" value="0" required />0 = Ningún esfuerzo</label>
+          <label class="rating-option-label"><input type="radio" name="rpe" value="1" />1–2 = Muy ligero</label>
+          <label class="rating-option-label"><input type="radio" name="rpe" value="3" />3–4 = Ligero / moderado</label>
+          <label class="rating-option-label"><input type="radio" name="rpe" value="5" />5–6 = Medio / algo duro</label>
+          <label class="rating-option-label"><input type="radio" name="rpe" value="7" />7–8 = Duro</label>
+          <label class="rating-option-label"><input type="radio" name="rpe" value="9" />9–10 = Máximo esfuerzo</label>
+        </div>
+      </div>
+
+      <button type="submit">Enviar</button>
+      <div class="success" id="successMsg"></div>
+    </form>
+  </div>
+
+  <script>
+    document.getElementById("rpeForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const form = e.target;
+      const submitBtn = form.querySelector("button");
+      const successMsg = document.getElementById("successMsg");
+
+      const today = new Date();
+      const fecha = today.toISOString().split("T")[0];
+
+      const data = {
+        nombre: form.nombre.value.trim(),
+        fecha: fecha,
+        rpe: form.rpe.value
+      };
+
+      submitBtn.innerText = "Enviando... no te vayas porfa 🙏";
+      submitBtn.disabled = true;
+      submitBtn.style.backgroundColor = "#888";
+
+      fetch("https://script.google.com/macros/s/AKfycbzkukfWlSFaduMNuFuHSGB4oU51f24GNJZFWeQnAMEaxsOmVmXRe6WEUJlq3CMOW_HI2w/exec", {
+        method: "POST",
+        body: new URLSearchParams({ data: JSON.stringify(data) }),
+      })
+        .then((res) => res.json())
+        .then((res) => {
+          successMsg.innerText = "✅ Enviado correctamente. ¡Gracias!";
+          form.reset();
+          submitBtn.innerText = "Enviado ✅";
+          submitBtn.style.backgroundColor = "#ccc";
+          submitBtn.style.cursor = "not-allowed";
+        })
+        .catch((err) => {
+          successMsg.innerText = "❌ Error al enviar. Intenta de nuevo.";
+          submitBtn.innerText = "Enviar";
+          submitBtn.disabled = false;
+          submitBtn.style.backgroundColor = "#00b894";
+          submitBtn.style.cursor = "pointer";
+        });
+    });
+  </script>
+</body>
+</html>
